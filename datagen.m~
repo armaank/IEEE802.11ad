@@ -12,15 +12,7 @@ classdef datagen
             
         end
         
-        function [seq_guard] = guard(seq)
-            % add gaurd interval to bit sequence. gaurd interval consists 
-            % of a pi/2 BPSK golay sequence
-        
-        end
-        
-        function [bits_inter] = interleaver(bits)
-            % bit interleaver
-        end
-        
+        function [ ] = guard(seq)
+            
     end
 end

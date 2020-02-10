@@ -1,0 +1,10 @@
+% defining functions associated with data manipulation
+classdef modulator
+    methods(Static)
+        
+        function [data_bpsk] = bpskmod(data)
+         
+
+    
+    
+end
