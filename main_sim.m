@@ -1,5 +1,6 @@
 % generate frame, pass frame through awgn, decode frame
-
+clc;
+clear;
 % to generate frame, read in .mat file of data (start w/ random data)
 % next, scramble data w/ polynomial (test decode)
 % find where gen. polynomial cfs are transmitted (if at all)
@@ -14,14 +15,16 @@ data = logical(randi([0 1],672/2,1));
 % psdu_tx - descrambler
 pcm = paritycheck.pcm(1/2);
 M = 4; % Modulation order (QPSK)
-pskMod = comm.PSKModulator(M,'BitInput',true);
-pskDemod = comm.PSKDemodulator(M,'BitOutput',true,...
-    'DecisionMethod','Approximate log-likelihood ratio');
-pskuDemod = comm.PSKDemodulator(M,'BitOutput',true,...
-    'DecisionMethod','Hard decision');
+% pskmod = comm.PSKModulator(M,pi/2,'BitInput',true);
+% pskdemod = comm.PSKDemodulator(M,pi/2,'BitOutput',true,...
+%     'DecisionMethod','Approximate log-likelihood ratio');
+% pskuDemod = comm.PSKDemodulator(M,'BitOutput',true,...
+%     'DecisionMethod','Hard decision');
 encData = codes.ldpc(data, pcm);
-        modSig = pskMod(encData);
-        demodSig = pskDemod(modSig);
+%         modSig = pskmod(encData, pi/2,M);
+%         demodSig = pskdemod(modSig,pi/2,M);
+        modSig = modulator.pskmod(encData, pi/2,M);
+        demodSig = modulator.pskdemod(modSig,pi/2,M);
         rxBits = codes.ldpc_decode(demodSig, pcm);
 % n_frames = 2; % number of frames used to test BER
 % snr_vec = [0:2:16]; % SNR values
