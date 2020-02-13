@@ -2,11 +2,13 @@
 classdef modulator
     methods(Static)
         
-        function [data_bpsk] = bpskmod(data, phase)
+        function [mod_data] = bpskmod(data, phase)
             % bpsk modulator w/ a specified phase offset (typ. pi/2)
-        
+             bpskModulator = comm.BPSKMODULATOR;
+             bpskModulator.PhaseOffset = phase;
+             mod_data = bpskModulator(data);
         end
-        % etc, more go here
-    
-    
+
+        
+    end
 end
