@@ -1,0 +1,17 @@
+% defining functions associated with error control coding
+classdef codes
+   methods(Static)
+       
+       function [seq_ldpc] = ldpc(seq, rate, pcm)
+           %ldpc encodes a bit sequence
+           ldpcEncoder = comm.LDPCEncoder(pcm)
+           
+       end
+       
+       function [seq_golay] = golay(seq)
+           % generates a golay sequence for the gaurd interval
+       end
+       
+   end
+    
+end

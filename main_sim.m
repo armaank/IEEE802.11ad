@@ -6,13 +6,23 @@
 
 out = mcsParams(1)
 n_octets = 3  % number of psdu data octets
-psdu_tx = randi([0,1],3*8,1)
-[seq, seed] = datagen.scramblerSeq(length(psdu_tx));
-scramblerout = xor(psdu_tx, seq)
-descrambler = xor(scramblerout, seq)
-seq2 = datagen
-psdu_tx - descrambler
-
+data = logical(randi([0 1],672/2,1));
+% [seq, seed] = datagen.scramblerSeq(length(psdu_tx));
+% scramblerout = xor(psdu_tx, seq)
+% descrambler = xor(scramblerout, seq)
+% seq2 = datagen
+% psdu_tx - descrambler
+pcm = paritycheck.pcm(1/2);
+M = 4; % Modulation order (QPSK)
+pskMod = comm.PSKModulator(M,'BitInput',true);
+pskDemod = comm.PSKDemodulator(M,'BitOutput',true,...
+    'DecisionMethod','Approximate log-likelihood ratio');
+pskuDemod = comm.PSKDemodulator(M,'BitOutput',true,...
+    'DecisionMethod','Hard decision');
+encData = codes.ldpc(data, pcm);
+        modSig = pskMod(encData);
+        demodSig = pskDemod(modSig);
+        rxBits = codes.ldpc_decode(demodSig, pcm);
 % n_frames = 2; % number of frames used to test BER
 % snr_vec = [0:2:16]; % SNR values
 % len_snr = length(snr_vec);
