@@ -26,6 +26,7 @@ encData = codes.ldpc(data, pcm);
         modSig = modulator.pskmod(encData, pi/2,M);
         demodSig = modulator.pskdemod(modSig,pi/2,M);
         rxBits = codes.ldpc_decode(demodSig, pcm);
+Golay_seq = golay('a32')c
 % n_frames = 2; % number of frames used to test BER
 % snr_vec = [0:2:16]; % SNR values
 % len_snr = length(snr_vec);

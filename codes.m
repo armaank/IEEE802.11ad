@@ -5,18 +5,16 @@ classdef codes
        function [seq_ldpc] = ldpc(seq, pcm)
            %ldpc encodes a bit sequence
            ldpcEncoder = comm.LDPCEncoder(pcm);
-           seq_ldpc = ldpcEncoder(seq)
+           seq_ldpc = ldpcEncoder(seq);
        end
        
        function [ldpc_out] = ldpc_decode(seq,pcm)
            % decodes an ldpc
            ldpcDecoder = comm.LDPCDecoder(pcm);
-           ldpc_out = ldpcDecoder(seq)
+           ldpc_out = ldpcDecoder(seq);
        end
-       
-       function [seq_golay] = golay(seq)
-           % generates a golay sequence for the gaurd interval
-       end
+       % TODO: Place parity-check matrix generation here, remove
+       % paritycheck.m, golay codes go elsewhere 
        
    end
     
