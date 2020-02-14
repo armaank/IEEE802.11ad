@@ -68,6 +68,28 @@ classdef codes
                 end
             end
         end
+        
+        function [output] = crc16(input)
+        % CRC for header check sequence
+        % input: input - input bit stream (header)
+        % output: output - crc encoded output
+            % initialize CRC registers to ones
+            crcGen = comm.CRCGenerator('Polynomial',[16 12 5 0]);
+            set(crcGen,'InitialConditions', [1 1 1 1 1 1 1 1 ...
+                1 1 1 1 1 1 1 1])
+
+            for ii = 1:length(input)
+                inputbit = input(ii);
+                tmpoutputCRC = step(crcGen, inputbit);
+
+                % set output as the 'InitialConditions'
+                release(crcGen)
+                set(crcGen, 'InitialConditions', tmpoutputCRC(1:16))
+            end
+
+            output = single(~tmpoutputCRC(1:16));
+        end
+
 
     end % end methods
 end % end classdef

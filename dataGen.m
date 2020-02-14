@@ -12,13 +12,12 @@ classdef dataGen
             
         end
         
-        function [seq, seed] = scramblerSeq(seqlen)
+        function [seq] = scramblerSeq(seqlen, seed)
             % data scrambler
             % generates scrambling sequence from x^7 + x^4 + 1
             % input: seqlen - desired sequence length
+            %        seed - random seed used to generate the sequence
             % output: seq - scrambling sequence 
-            %         seed - random seed used to generate the sequence
-            seed = randi([0,1],1,7); % 7-bit sequence to seed LFSR
             seq = nan(seqlen, 1);
             lfsr = seed;
             for ii = 1:seqlen
