@@ -2,20 +2,31 @@
 classdef modulator
     methods(Static)
         
-        function [mod_data] = pskmod(data, phase, M)
-            % psk modulator w/ a specified phase offset (typ. pi/2)
+        function [modOut] = pskmod(modIn, phase, M)
+            % psk modulator 
+            % inputs: modIn - input to modulator
+            %         phase - phase offset for constellation (typ. pi/2)
+            %         M - modulation order (2 for bpsk, 4 for qpsk, etc.)
+            % outputs: modOut - modulated input
              pskModulator = comm.PSKModulator(M,phase,'BitInput',true);
-             mod_data = pskModulator(data);
+             modOut = pskModulator(modIn);
         end
         
-        function [demod_data] = pskdemod(data, phase, M)
-            % psk modulator w/ a specified phase offset (typ. pi/2)
-             pskDemodulator = comm.PSKDemodulator(M, phase,'BitOutput',...
+        function [demodOut] = pskdemod(demodIn, phase, M)
+            % psk demodulator 
+            % inputs: demodIn - input to demodulator
+            %         phase - phase offset for constellation (typ. pi/2)
+            %         M - modulation order (2 for bpsk, 4 for qpsk, etc.)
+            % outputs: demodOut - demodulated input
+            pskDemodulator = comm.PSKDemodulator(M, phase,'BitOutput',...
                  true,'DecisionMethod','Approximate log-likelihood ratio');
-             demod_data = pskDemodulator(data);
+             demodOut = pskDemodulator(demodIn);
         end
-
-
+        
+        function [modOut] = qammod(demodIn, phase, M)
+            
+       
+        end
         
     end
 end
