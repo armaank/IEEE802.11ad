@@ -1,8 +1,10 @@
 % wls for directional multi-gigabit (DMG) single carrier (SC) PHY layer for
 % IEEE802.11ad
 %% Simulation Parameters
-mcs = 1 % modulation and coding scheme index
-length = 5 % number of data octets in PSDU (find abbrev)
+mcs = 2 % modulation and coding scheme index
+n_octets = 5 % number of data octets in PSDU (find abbrev)
+[modtype, Ncbps, ldpc_cr, Mbps, cw_size, n_data_bits, Ncbpb, reps ] ...
+    = mcsParams(mcs)
 %% Frame 
 % assembling the frame for tx
 
@@ -32,7 +34,7 @@ mcsIdx = double(dec2bin(mcs, 5)-'0');
 % MCS index stored in header starting at the 7th bit
 header(8:12) = mcsIdx;
 % number of data octets (length) stored starting at the 12th bit
-header(13:30) = double(dec2bin(length,18)-'0');
+header(13:30) = double(dec2bin(n_octets,18)-'0');
 % "contains a copy of the parameter ADD_PPDU etc. page 470"
 addPPDU = 0; % set to zero for now, can change later
 header(31) = addPPDU ; % change later
@@ -54,11 +56,26 @@ header(45:48) = reserved;
 HCS = codes.crc16(header(1:48));
 header(49:end) = HCS;
 % header complete 
+%% Constructing Data  
+% use random data for now
+PSDU_tx = randi([0 1],n_octets*8,1);
+% add code rate dependent padding
+n_cw = ceil((n_octets*8)/((cw_size/reps)*ldpc_cr));   
+PSDU_pad = (n_cw*(cw_size/reps)*ldpc_cr)-(n_octets*8);
+PSDU_tx_paded = [PSDU_tx; zeros(PSDU_pad,1)];
 
-% constructing data 
-
-
-% data complete
+N_blks = ceil((n_cw*cw_size)/Ncbpb);
+N_blk_pad = (N_blks*Ncbpb)-(n_cw*cw_size)
+        
+%% Scrambling
+% generate random seed 
+seed = randi([0,1], 1, 7);
+% generate scrambling sequence from seed and data length
+scram_seq = dataGen.scramblerSeq(length(PSDU_tx_paded) + N_blk_pad, seed);
+scram_seq_data = scram_seq(1:length(PSDU_tx_paded));
+scram_seq_block_pad = scram_seq(length(PSDU_tx_paded)+1:end);
+% scramble data
+scramblerOut = xor(PSDU_tx_paded, scram_seq_data)
 
 
                          
