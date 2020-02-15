@@ -3,8 +3,23 @@
 %% Simulation Parameters
 mcs = 1 % modulation and coding scheme index
 length = 5 % number of data octets in PSDU (find abbrev)
-%% Frame
+%% Frame 
 % assembling the frame for tx
+
+% constructing the short training field (STF)
+% STF is comprised of golay sequences defined in the spec
+Ga128 = golay('a128');
+Gb128 = golay('b128');
+STF = [repmat(Ga128, 1, 16), -Ga128];
+% STF complete
+
+% constructing the channel estimation field (CEF)
+% CEF is also comprimised of golay sequences
+Gu512 = [-Gb128, -Ga128, +Gb128, -Ga128];
+Gv512 = [-Gb128, +Ga128, -Gb128, -Ga128];
+Gv128 = -Gb128;
+CEF = [Gu512, Gv512, Gv128];
+%CEF complete
 
 % constructing header field
 header = nan(64,1);
@@ -29,7 +44,7 @@ aggregation = 0; % for beamforming
 header(38) = aggregation;
 beamTrackingRequest = 0; % for beamforming
 header(39) = beamTrackingRequest;
-lastRSSI = [0 0 0 0]; % for power distribution
+lastRSSI = [1 1 1 1]; % for power distribution
 header(40:43) = lastRSSI;
 turnaround = 0; % for ?
 header(44) = turnaround;
@@ -38,8 +53,14 @@ header(45:48) = reserved;
 % header check sequence
 HCS = codes.crc16(header(1:48));
 header(49:end) = HCS;
-
 % header complete 
+
+% constructing data 
+
+
+% data complete
+
+
                          
 
 
