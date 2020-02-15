@@ -3,7 +3,7 @@
 %% Simulation Parameters
 mcs = 2 % modulation and coding scheme index
 n_octets = 5 % number of data octets in PSDU (find abbrev)
-[modtype, Ncbps, ldpc_cr, Mbps, cw_size, n_data_bits, Ncbpb, reps ] ...
+[modorder, Ncbps, ldpc_cr, Mbps, cw_size, n_data_bits, Ncbpb, reps ] ...
     = mcsParams(mcs)
 %% Frame 
 % assembling the frame for tx
@@ -114,12 +114,26 @@ scrambled_block_pad_zeros = xor(block_pad_zeros, scram_seq_block_pad); % tx bloc
 encoderOut = [encoderOut_single_row, scrambled_block_pad_zeros.']; % for raw BER computing
 
 %% Modulation
+% modulating the data only right now, CEF, header and STF are modulated
+% seperately w/ a different scheme
 
+mod_data = modulator.pskmod(encoderOut', pi/2, modorder);
 
+%% Symbol Blocking and Gaurd Inverval Insertion 
+mod_data_blocks = reshape(mod_data, [], N_blks);
+Ga64 = golay('a64');
+% modulating the golay sequence
+k = 0:63;
+Ga64_mod = Ga64.*exp(1j*pi*k/2);
+GI = repmat(Ga64_mod, N_blks, 1);
+                    
+gaurded_mod_data = [GI, mod_data_blocks'];
+% single stream of guard and blocks
+outputBlocks = reshape(gaurded_mod_data.',[],1).';
+% add the last guard on the end of the final block
+outputBlocks = [outputBlocks, Ga64_mod];
 
-                         
-
-
+%% 
 
 
 

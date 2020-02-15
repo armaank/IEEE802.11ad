@@ -1,11 +1,11 @@
 % Function to retrieve all paramaters associated with each modulation
 % coding scheme (MCS)
-function [modtype, Ncbps, ldpc_cr, Mbps, cw_size,...
+function [modorder, Ncbps, ldpc_cr, Mbps, cw_size,...
     n_data_bits, Ncbpb, rep]  = mcsParams(mcs_num)
 
 switch(mcs_num)
     case 1
-        modtype = 2; % pi/2 bpsk modulaton
+        modorder = 2; % pi/2 bpsk modulaton
         Ncbps = 1; % number of coded bits per symbol
         ldpc_cr = 1/2; % code rate 
         Mbps = 385; % data rate, mega bits per second
@@ -14,7 +14,7 @@ switch(mcs_num)
         Ncbpb = 448; % number of coded bits per block
         rep = 2; % repitition for code rate ? 
     case 2
-        modtype = 2; % pi/2 bpsk modulaton
+        modorder = 2; % pi/2 bpsk modulaton
         Ncbps = 1; % number of coded bits per symbol
         ldpc_cr = 1/2; % code rate 
         Mbps = 770; % data rate, mega bits per second
