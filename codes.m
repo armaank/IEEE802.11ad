@@ -64,7 +64,7 @@ classdef codes
             for ii=1:size(P,1)
                 for jj=1:size(P,2)
                       H((ii-1)*Z(1)+1:ii*Z(1),(jj-1)*Z(2)+1:jj*Z(2))...
-                            = codes.LDPC_shift(P(ii,jj), I);
+                            = codes.LDPCshift(P(ii,jj), I);
                 end
             end
         end

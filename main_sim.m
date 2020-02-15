@@ -77,6 +77,45 @@ scram_seq_block_pad = scram_seq(length(PSDU_tx_paded)+1:end);
 % scramble data
 scramblerOut = xor(PSDU_tx_paded, scram_seq_data)
 
+%% LDPC Encoding
+% generate partiy check matrix from code rate
+pcm = codes.pcm(ldpc_cr);
+% LDPC encoding depends on if repetition is used or not
+switch(reps)
+    case 1
+        % preallocation of output auxiliary matrix
+        encoderOut_all_cw = zeros(n_cw, cw_size);
+        % scrambler output stream is broken into blocks of L_cwd bits
+        L_cwd = cw_size*ldpc_cr;
+        % sequences of length L_cwd, each row = single input data word
+        encoderIn_data_blocks = reshape(scramblerOut, L_cwd, []).';
+        % encode each data word
+        for i_cw = 1:n_cw
+            encoderIn_cw_temp = encoderIn_data_blocks(i_cw, :);
+
+            encoderOut_cw_temp = codes.ldpc(encoderIn_cw_temp.', pcm);
+            encoderOut_cw_temp = encoderOut_cw_temp.';
+            % save input word and parity to matrix (each row = 1 codeword)
+            encoderOut_all_cw(i_cw, :) = encoderOut_cw_temp;
+        end
+    otherwise
+        warning('choose a valid repetiton number (1 )')
+end
+encoderOut_single_row = reshape(encoderOut_all_cw.', 1, []);
+
+% d] divide to symbol blocks and add symbol pad bits
+% e] concatenation of coded bit stream and N_blk_pad zeros
+block_pad_zeros = zeros(N_blk_pad, 1);
+% scrambling of block pad bits with continuous scrambling sequence from
+% data scrambling
+scrambled_block_pad_zeros = xor(block_pad_zeros, scram_seq_block_pad); % tx block pad zeros scrambling ON
+
+% concatenation
+encoderOut = [encoderOut_single_row, scrambled_block_pad_zeros.']; % for raw BER computing
+
+%% Modulation
+
+
 
                          
 
