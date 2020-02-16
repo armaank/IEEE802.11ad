@@ -36,7 +36,16 @@ classdef codes
                 29,nan,  0,nan,nan, 22,nan,  4,nan, 28,nan, 27,nan, 23,nan,nan; 
                 nan, 31,nan, 23,nan, 21,nan, 20,nan,nan, 12,nan,nan,  0, 13,nan;
                 nan, 22,nan, 34, 31,nan, 14,nan,  4,nan,nan,nan, 13,nan, 22, 24;
-                ]; 
+                ];
+            elseif(coderate == 3/4)
+                H = sparse(168,672);
+                Z = 42;
+                I = speye(Z);
+                P = [35, 19, 41, 22, 40, 41, 39,  6, 28, 18, 17,  3, 28,nan,nan,nan;
+                29, 30,nan,  8, 33, 22, 17,  4, 27, 28, 20, 27, 24, 23,nan,nan;
+                37, 31, 18, 23, 11, 21,  6, 20, 32,  9, 12, 29,nan,  0, 13,nan;
+                25, 22,  4, 34, 31,  3, 14, 15,  4,nan, 14, 18, 13, 13, 22, 14;
+                ];     
             end
             PCM = codes.makePCM(H, P, I);               
         end

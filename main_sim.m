@@ -77,7 +77,7 @@ scram_seq_block_pad = scram_seq(length(PSDU_tx_paded)+1:end);
 % scramble data
 scramblerOut = xor(PSDU_tx_paded, scram_seq_data)
 
-%% LDPC Encoding
+%% Data Coding
 % generate partiy check matrix from code rate
 pcm = codes.pcm(ldpc_cr);
 % LDPC encoding depends on if repetition is used or not
@@ -123,21 +123,48 @@ mod_data = modulator.pskmod(encoderOut', pi/2, modorder);
 mod_data_blocks = reshape(mod_data, [], N_blks);
 Ga64 = golay('a64');
 % modulating the golay sequence
-k = 0:63;
-Ga64_mod = Ga64.*exp(1j*pi*k/2);
+k_ga = 0:63;
+Ga64_mod = Ga64.*exp(1j*pi*k_ga/2);
 GI = repmat(Ga64_mod, N_blks, 1);
                     
-gaurded_mod_data = [GI, mod_data_blocks'];
+gaurded_mod_data = [GI, mod_data_blocks.'];
 % single stream of guard and blocks
 outputBlocks = reshape(gaurded_mod_data.',[],1).';
 % add the last guard on the end of the final block
 outputBlocks = [outputBlocks, Ga64_mod];
 
-%% 
+%% Modulating CEF and STF
+% pi/2 bpsk modulating STF
+k_stf = [0:length(STF)-1];
+STF_mod = STF.*exp(1j*pi*k_stf/2);
+% pi/2 bpsk modulating CEF
+k_cef = [0:length(CEF)-1];
+CEF_mod = CEF.*exp(1j*pi*k_cef/2);
 
+%% Header Coding
+% scramble header (except the first seven bits)
+scram_seq_header = dataGen.scramblerSeq(length(header)-7 ,seed);
+scrambled_header = [header(1:7); xor(header(8:end), scram_seq_header)]
+% LDPC encoding header. rate = 3/4 for header, so need to generate new H
+PCM_header = codes.pcm(3/4);
+padded_scrambled_header = [scrambled_header; zeros(1, 504 - length(header)).']
+encoded_header = codes.ldpc(padded_scrambled_header, PCM_header)
+% setting up the two code words sequences from the spec
+cws1 = encoded_header; cws2 = encoded_header;
+cws1([length(header)+1:504, 665:672]) = []; 
+cws2([length(header)+1:504, 657:664]) = []; 
+scram_seq_cws2 = dataGen.scramblerSeq(length(cws2), ones(7,1));
+cws2_scrambled = xor(cws2, scrcws2_scarmbledam_seq_cws2);
+header_cw = [cws1;cws2_scrambled];
 
+%% Header Modulation and Gaurd Insertion
+% modulation
+header_mod = modulator.pskmod(header_cw, pi/2, 2)
+% gaurd insertion
+gaurded_header = [Ga64_mod.'; header_mod; Ga64_mod'; -header_mod];
 
+%% Constructing final packet for tx
 
-
+packet = [STF_mod, CEF_mod, gaurded_header.', outputBlocks];
 
 
