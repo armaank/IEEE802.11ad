@@ -117,7 +117,7 @@ encoderOut = [encoderOut_single_row, scrambled_block_pad_zeros.']; % for raw BER
 % modulating the data only right now, CEF, header and STF are modulated
 % seperately w/ a different scheme
 
-mod_data = modulator.pskmod(encoderOut', pi/2, modorder);
+mod_data = modulator.pskmod(encoderOut.', pi/2, modorder);
 
 %% Symbol Blocking and Gaurd Inverval Insertion 
 mod_data_blocks = reshape(mod_data, [], N_blks);
@@ -154,7 +154,7 @@ cws1 = encoded_header; cws2 = encoded_header;
 cws1([length(header)+1:504, 665:672]) = []; 
 cws2([length(header)+1:504, 657:664]) = []; 
 scram_seq_cws2 = dataGen.scramblerSeq(length(cws2), ones(7,1));
-cws2_scrambled = xor(cws2, scrcws2_scarmbledam_seq_cws2);
+cws2_scrambled = xor(cws2, scram_seq_cws2);
 header_cw = [cws1;cws2_scrambled];
 
 %% Header Modulation and Gaurd Insertion
@@ -163,8 +163,67 @@ header_mod = modulator.pskmod(header_cw, pi/2, 2)
 % gaurd insertion
 gaurded_header = [Ga64_mod.'; header_mod; Ga64_mod'; -header_mod];
 
-%% Constructing final packet for tx
+%% Constructing final packet for TX
 
 packet = [STF_mod, CEF_mod, gaurded_header.', outputBlocks];
+
+
+%% Rx
+
+% after passing packet through awgn channel, we need to receive the packet,
+% and decode it accordingly
+% parsing received frame
+rx_stf = packet(1:2176); % length of STF isn't dependent on MCS 
+rx_cef = packet(2176+1:2176+1152); % length of CEF isn't dependent on MCS
+rx_header = packet(2176+1152+1:2176+1152+1024); 
+rx_data = packet(2176+1152+1024+1:end);
+
+% Parse STF for timing synchronization (out of project spec)
+
+% Perform channel equilization and estimation with CEF 
+% since no equalizer is specified in the IEEE 802.11ad spec, we perform no
+% channel equalization, so no need to perform any channel estimation
+
+% Gaurd removal
+rx_Ga64_mod = zeros(N_blks+1, 64); % preallocation (N_blks +1 of Ga64 sequences within data frame)
+% remove Ga64 at the end of rx data blocks stream
+rx_data_length = length(rx_data);
+rx_Ga64_mod(N_blks+1, :) = rx_data(1, rx_data_length-64+1:rx_data_length);
+rx_data(rx_data_length-64+1:rx_data_length) = [];
+n_fft = 512
+rx_modulatedDataSymbolsAndGuard = reshape(rx_data, n_fft, []).';
+% rest of guard removal
+
+rx_guard = rx_modulatedDataSymbolsAndGuard(:,1:64);
+rx_Ga64_mod(1:N_blks, :) = rx_guard;
+k_Ga64 = 0:64-1;
+rx_Ga64 = rx_Ga64_mod.*repmat(exp(-1j*pi*k_Ga64/2), N_blks+1, 1);
+
+rx_modulatedDataSymbol_blocks = rx_modulatedDataSymbolsAndGuard(:,64+1:n_fft);
+
+rx_modulatedDataSymbol_blocks - mod_data_blocks.'
+
+% Demodulation
+% todo: extract info from header, demod header
+rx_modulatedDataSymbol = reshape(-rx_modulatedDataSymbol_blocks.', 1, []).'
+rx_demod_data = modulator.pskdemod(rx_modulatedDataSymbol, pi/2, modorder);
+% redo, something strange w/ demod
+for ii=(1:length(rx_demod_data))
+   
+    if(rx_demod_data(ii) == -4)
+        rx_demod_data(ii)= 0;
+    else
+        rx_demod_data(ii) = 1;
+    end
+end
+rx_demod_data.' - encoderOut
+%rx_modulatedDataSymbol_blocks_derotated = rx_modulatedDataSymbol_blocks.*repmat(modulated_symbol_derotating_factor, N_blks, 1)
+
+
+
+
+
+
+
 
 
