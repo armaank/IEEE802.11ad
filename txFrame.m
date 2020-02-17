@@ -2,7 +2,7 @@
 classdef txFrame
     methods(Static)
         
-        function [packet_tx] = conFrame(psdu_bits_tx, n_octets, mcs, seed);
+        function [frame_tx] = conFrame(psdu_bits_tx, n_octets, mcs, seed);
             % constructs a final frame for tx 
             % inputs: psdu_bits_tx - input bitstream
             %         n_octets - number of octets in bitstream
@@ -18,8 +18,8 @@ classdef txFrame
             header_tx = txFrame.conHeader(mcs, n_octets, seed);
             % construct data 
             data_tx = txFrame.conData(psdu_bits_tx, mcs, n_octets, seed);
-            % put together final packet 
-            packet_tx = [STF_tx, CEF_tx, header_tx, data_tx];
+            % put together final frame 
+            frame_tx = [STF_tx, CEF_tx, header_tx, data_tx];
             
         end % end conFrame
         
