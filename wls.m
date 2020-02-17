@@ -162,7 +162,7 @@ header_cw = [cws1;cws2_scrambled];
 header_mod = modulator.pskmod(header_cw, pi/2, 2)
 % gaurd insertion
 gaurded_header = [Ga64_mod.'; header_mod; Ga64_mod'; -header_mod];
-
+% careful with tranpose !!!!!!!!!!!
 %% Constructing final packet for TX
 
 packet = [STF_mod, CEF_mod, gaurded_header.', outputBlocks];
