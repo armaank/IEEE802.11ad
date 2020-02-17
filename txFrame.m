@@ -2,7 +2,7 @@
 classdef txFrame
     methods(Static)
         
-        function [frame_tx] = conFrame(psdu_bits_tx, n_octets, mcs, seed);
+        function [frame_tx] = conFrame(psdu_bits_tx, n_octets, mcs, seed)
             % constructs a final frame for tx 
             % inputs: psdu_bits_tx - input bitstream
             %         n_octets - number of octets in bitstream
@@ -17,7 +17,7 @@ classdef txFrame
             % construct header
             header_tx = txFrame.conHeader(mcs, n_octets, seed);
             % construct data 
-            data_tx = txFrame.conData(psdu_bits_tx, mcs, n_octets, seed);
+            data_tx = txFrame.conData(psdu_bits_tx, n_octets, mcs, seed);
             % put together final frame 
             frame_tx = [STF_tx, CEF_tx, header_tx, data_tx];
             
@@ -69,7 +69,7 @@ classdef txFrame
             % constructing header field
             header = nan(64,1);
             % LFSR seed stored in first 7 bits of the header
-            header(1:7) = rand_eed; 
+            header(1:7) = seed; 
             % index for the MCS table, 24 total options so 5 bits
             mcsIdx = double(dec2bin(mcs, 5)-'0');
             % MCS index stored in header starting at the 7th bit
@@ -113,7 +113,8 @@ classdef txFrame
             cw1 = encoded_header; cw2 = encoded_header;
             cw1([length(header)+1:504, 665:672]) = []; 
             cw2([length(header)+1:504, 657:664]) = []; 
-            scram_seq_cw2 = scramscramblerSeq(length(cw2), ones(7,1));
+            % always scramble the second code word with ones
+            scram_seq_cw2 = scram(length(cw2), ones(7,1)); 
             cw2_scrambled = xor(cw2, scram_seq_cw2);
             header_cw = [cw1; cw2_scrambled];
             
@@ -138,6 +139,7 @@ classdef txFrame
             % outputs: 
             
             % retrieving mcs-dependent constants
+           mcs
             [modorder, Ncbps, ldpc_cr, Mbps, cw_len, n_data_bits,...
                 Ncbpb, reps ] = mcsParams(mcs);
             % add code rate dependent padding

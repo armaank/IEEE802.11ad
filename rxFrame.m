@@ -2,16 +2,19 @@
 classdef rxFrame
     methods(Static)
         
-        function [PSDU_rx] = deconFrame(rx_frame)
+        function [PSDU_rx] = deconFrame(rx_frame, mcs, seed, n_octets)
             % function to deconstruct received frame
             % inputs: rx_packet - the recieved frame 
             % outputs: 
             
-            [STF_rx, CEF_rx, header_rx, data_rx] = parseFrame(rx_frame);
+            [STF_rx, CEF_rx, header_rx, data_rx] = ...
+                rxFrame.parseFrame(rx_frame);
             % since equalization isn't part of the spec, we don't need to
             % do anything with the STF and CEF fields
-            [mcs, seed, n_octets] = deconHeader(header_rx);
-            [PSDU_rx] = deconData(data_rx, mcs, seed, n_octets);
+%             [mcs, seed, n_octets] = ...
+%                 rxFrame.deconHeader(header_rx);
+            [PSDU_rx] = ...
+                rxFrame.deconData(data_rx, mcs, seed, n_octets);
            
             
         end % end deconFrame
@@ -74,10 +77,10 @@ classdef rxFrame
                 data_rx(1, data_rx_len-64+1:data_rx_len);
             data_rx(data_rx_len-64+1:data_rx_len) = [];
             data_mod_rx_GI = reshape(data_rx, 512, []).';
-            
+            n_fft = 512;
             % demodulate gaurd interval
             gaurd_rx = data_mod_rx_GI(:,1:64);
-            Ga64_mod_rx(1:N_blks, :) = gaurd_rx;
+            Ga64_mod_rx(1:n_blks, :) = gaurd_rx;
             k_Ga64 = 0:64-1;
             Ga64_rx = ...
                 Ga64_mod_rx.*repmat(exp(-1j*pi*k_Ga64/2), n_blks+1, 1);
@@ -99,17 +102,17 @@ classdef rxFrame
             ldpc_in = data_demod_rx(1:length(data_demod_rx)-n_blk_pad,:);
             
             % generate partiy check matrix for LDPC code
-            H_data = codes.PCM(ldpc_cr);
+            H_data = codes.pcm(ldpc_cr);
             % decoding algo
             switch(reps)
                 case 1
                     % reshape input codeword to decode to N_cw rows
                     decode_in_cw = reshape(ldpc_in,[],n_cw).';
                     % scrambler output is broken into blocks of L_cwd bits
-                    L_cwd = cw_size*ldpc_cr;
+                    L_cwd = cw_len*ldpc_cr;
 
                     % preallocate output of the decoder
-                    decoderOut_cw = zeros(n_cw, L_cwd); % all cw
+                    decoderOut_cw_tmp = zeros(n_cw, L_cwd); % all cw
 
                     % decode each code word
                     for ii = 1:n_cw
@@ -117,14 +120,14 @@ classdef rxFrame
 
                         decoderOut_cw = ...
                             codes.ldpc_decode(-decoderIn_cw_temp.',H_data);
-                        decoderOut_cw(ii, :) = decoderOut_cw.';
+                        decoderOut_cw_tmp(ii, :) = decoderOut_cw.';
                     end % end for loop
 
                 case 2
                     
             end % end switch
             
-            ldpc_out = reshape(decoderOut_cw.',[],1).';
+            ldpc_out = reshape(decoderOut_cw_tmp.',[],1).';
             
             % descramble output to recover transmitted bits
             data_descram = xor(ldpc_out.', scram_seq_data_rx);
