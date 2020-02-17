@@ -208,21 +208,132 @@ rx_modulatedDataSymbol_blocks - mod_data_blocks.'
 rx_modulatedDataSymbol = reshape(-rx_modulatedDataSymbol_blocks.', 1, []).'
 rx_demod_data = modulator.pskdemod(rx_modulatedDataSymbol, pi/2, modorder);
 % redo, something strange w/ demod
-for ii=(1:length(rx_demod_data))
-   
-    if(rx_demod_data(ii) == -4)
-        rx_demod_data(ii)= 0;
-    else
-        rx_demod_data(ii) = 1;
-    end
-end
+% for ii=(1:length(rx_demod_data))
+%    
+%     if(rx_demod_data(ii) == -4)
+%         rx_demod_data(ii)= 0;
+%     else
+%         rx_demod_data(ii) = 1;
+%     end
+% end
 rx_demod_data.' - encoderOut
 %rx_modulatedDataSymbol_blocks_derotated = rx_modulatedDataSymbol_blocks.*repmat(modulated_symbol_derotating_factor, N_blks, 1)
 
+%% LDPC Decoding
+% start with random seed to unscramble data (should do this after decoding
+% header but ok for now)
+len_PSDU_rx_padded = 8*n_octets + PSDU_pad;
+rx_scram_seq = dataGen.scramblerSeq(len_PSDU_rx_padded+N_blk_pad, seed);
+
+rx_scramblingSeq_data = rx_scram_seq(1:len_PSDU_rx_padded); % scrambling seq for input data
+rx_scramblingSeq_block_pad = rx_scram_seq(len_PSDU_rx_padded+1:end); % scram
+
+% encoderOut_single_row - decoderIn_extracted.'
+
+decoderIn_extracted = rx_demod_data(1:length(rx_demod_data)-N_blk_pad,:);
+% extract block pad zeros
+
+encoderOut_single_row - decoderIn_extracted.'
+
+
+extracted_blk_pads = rx_demod_data(end-N_blk_pad+1:end,:);
+descrambled_blk_pads = extracted_blk_pads.*(-2*rx_scramblingSeq_block_pad+1); % should be all logical zeros (i.e. > 0)
 
 
 
+PCM = codes.pcm(ldpc_cr);
 
+switch(reps)
+    case 1
+        % reshape input codeword to decode to N_cw rows
+        decoderIn_all_cw = reshape(decoderIn_extracted,[],n_cw).';
+        % scrambler output stream is broken into blocks of L_cwd bits
+        L_cwd = cw_size*ldpc_cr;
+
+        % preallocate output of the decoder
+        decoderOut_cw_tmp = zeros(n_cw, L_cwd); % all cw
+
+        % decode each code word
+        for i_cw = 1:n_cw
+            decoderIn_cw_temp = decoderIn_all_cw(i_cw, :);
+        
+            decoderOut_cw = codes.ldpc_decode(-decoderIn_cw_temp.', PCM)
+            decoderOut_cw_tmp(i_cw, :) = decoderOut_cw.';
+        end
+       
+    case 2
+       
+        
+end
+decoderOut = reshape(decoderOut_cw_tmp.',[],1).';
+decoderOut - scramblerOut'
+
+%% TEST LDPC
+% clc;
+% clear;
+% % PCM = codes.pcm(1/2)
+% % data = randi([0 1],672/2,1);
+% % ldpc_enc_data = codes.ldpc(data, PCM)
+% % ldpc_enc_data = awgn(ldpc_enc_data,10);
+% % ldpc_dec_data = codes.ldpc_decode(ldpc_enc_data, PCM)
+% % ldpc_dec_data - data
+% PCM = codes.pcm(1/2)
+% M = 2; % Modulation order (QPSK)
+% snr = 1;
+% numFrames = 1;
+% ldpcEncoder = comm.LDPCEncoder(PCM);
+% ldpcDecoder = comm.LDPCDecoder(PCM);
+% pskMod = comm.PSKModulator(M,'BitInput',true);
+% pskDemod = comm.PSKDemodulator(M,'BitOutput',true,...
+%     'DecisionMethod','Approximate log-likelihood ratio');
+% pskuDemod = comm.PSKDemodulator(M,'BitOutput',true,...
+%     'DecisionMethod','Hard decision');
+% errRate = zeros(1,length(snr));
+% uncErrRate = zeros(1,length(snr));
+% for ii = 1:length(snr)
+%     ttlErr = 0;
+%     ttlErrUnc = 0;
+%     pskDemod.Variance = 1/10^(snr(ii)/10); % Set variance using current SNR
+%     for counter = 1:numFrames
+%         data = (randi([0 1],672/2,1));
+%         % Transmit and receiver uncoded signal data
+%         mod_uncSig = pskMod(data);
+%         rx_uncSig = awgn(mod_uncSig,snr(ii),'measured');
+%         demod_uncSig = pskuDemod(rx_uncSig);
+%         numErrUnc = biterr(data,demod_uncSig);
+%         ttlErrUnc = ttlErrUnc + numErrUnc;
+%         % Transmit and receive LDPC coded signal data
+%         encData = ldpcEncoder(data);
+%         modSig = pskMod(encData);
+%         %rxSig = awgn(modSig,snr(ii),'measured');
+%         demodSig = pskDemod(modSig);
+%                 modSig - demodSig
+% 
+%         rxBits = ldpcDecoder(demodSig);
+%         numErr = biterr(data,rxBits)
+%         ttlErr = ttlErr + numErr;
+%     end
+%     ttlBits = numFrames*length(rxBits);
+%     uncErrRate(ii) = ttlErrUnc/ttlBits;
+%     errRate(ii) = ttlErr/ttlBits;
+% end
+%%
+decoderIn_all_cw - encoderOut_all_cw
+test_out = codes.ldpc_decode(decoderIn_all_cw.', PCM)
+
+test_out - scramblerOut
+
+decoderOut_cw = encoderOut_cw_temp;
+
+
+decoderOut = reshape(decoderOut_cw_tmp.',[],1).';
+
+decoderOut - scramblerOut.'
+
+%% descarmble
+descrambleOut = xor(decoderOut.', rx_scramblingSeq_data)
+PSDU_rx = descrambleOut(1:n_octets*8,1)
+PSDU_rx - PSDU_tx
 
 
 
