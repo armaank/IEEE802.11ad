@@ -22,7 +22,24 @@ switch(mcs_num)
         n_data_bits = 336; % number of data bits for 1/2 code rate
         Ncbpb = 448; % number of coded bits per block
         rep = 1; % repitition for code rate ? 
-        
+    case 3
+        modorder = 2; % pi/2 bpsk modulaton
+        Ncbps = 1; % number of coded bits per symbol
+        ldpc_cr = 5/8; % code rate 
+        Mbps = 962.5; % data rate, mega bits per second
+        cw_len = 672; % codeword size for 1/2 code rate
+        n_data_bits = 420; % number of data bits for 1/2 code rate
+        Ncbpb = 448; % number of coded bits per block
+        rep = 1; % repitition for code rate ? 
+    case 4
+        modorder = 2; % pi/2 bpsk modulaton
+        Ncbps = 1; % number of coded bits per symbol
+        ldpc_cr = 3/4; % code rate 
+        Mbps = 1155; % data rate, mega bits per second
+        cw_len = 672; % codeword size for 1/2 code rate
+        n_data_bits = 504; % number of data bits for 1/2 code rate
+        Ncbpb = 448; % number of coded bits per block
+        rep = 1; % repitition for code rate ? 
     otherwise
         warning('choose a valid mcs')
     

@@ -139,7 +139,6 @@ classdef txFrame
             % outputs: 
             
             % retrieving mcs-dependent constants
-           mcs
             [modorder, Ncbps, ldpc_cr, Mbps, cw_len, n_data_bits,...
                 Ncbpb, reps ] = mcsParams(mcs);
             % add code rate dependent padding
