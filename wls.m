@@ -4,12 +4,12 @@ clear;
 
 %% BER Simulation
 
-snr_vec = -4:1:5; % SNR values for BER curve
+snr_vec = -2:1:12; % SNR values for BER curve
 snr_len = length(snr_vec);
 n_frames = 10; % number of iterations for the monte-carlo simulation
 n_octets = 1000; % number of data octets in PSDU 
 
-mcs = 1;   % MCSs that are required for the standard [1, 2, 3, 4]
+mcs = 3;   % MCSs that are required for the standard [1, 2, 3, 4]
 
 % setting up awgn channel
 awgnChannel = comm.AWGNChannel('NoiseMethod','Variance','Variance',1);
@@ -32,7 +32,7 @@ for frame_num = 1:n_frames % average results over n_frames
         % Adding the proper noise to the channel cooresponding to the SNR
         awgnChannel.Variance = noiseVar;
 
-        while errorStats(3) <  1e4 %10e5
+        while errorStats(3) < 10e5
             % generate random PSDU bits
             psdu_bits_tx = randi([0 1],n_octets*8,1);
             % generate random seed for scrambling sequences
@@ -63,7 +63,7 @@ semilogy(snr_vec,ber_Vec,'-*')
 grid on
 xlabel('SNR (dB)')
 ylabel('Bit Error Rate')
-title("BER Waterfall Curves for MCS 2");
+title("BER Waterfall Curves for MCS");
 
 
 

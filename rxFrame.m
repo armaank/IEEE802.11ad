@@ -10,7 +10,8 @@ classdef rxFrame
             [STF_rx, CEF_rx, header_rx, data_rx] = ...
                 rxFrame.parseFrame(rx_frame);
             % since equalization isn't part of the spec, we don't need to
-            % do anything with the STF and CEF fields
+            % do anything with the STF and CEF fields, we only need to
+            % parse the data to check the BER
 %             [mcs, seed, n_octets] = ...
 %                 rxFrame.deconHeader(header_rx);
             [PSDU_rx] = ...
@@ -38,18 +39,7 @@ classdef rxFrame
             data_rx = rx_frame(2176+1152+1024+1:end);
             
         end % end parseFrame
-        
-        function [mcs, seed, n_octets] = deconHeader(header_rx)
-            % function to deconstruct header
-            % inputs: header_rx - parsed header field
-            % outputs: mcs - modulating and coding scheme index
-            %          seed - random seed used for scrambler init
-            %          n_octets - number of data octets
-            
-            
-            
-        end % end deconHeader
-        
+                
         function [psdu_rx] = deconData(data_rx, mcs, seed, n_octets)
             % function to deconstruct data for BER computation
             % inputs: data_rx - parsed data field
