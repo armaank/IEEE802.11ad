@@ -124,6 +124,29 @@ classdef rxFrame
                     end % end for loop
 
                 case 2
+                    len_zeros = cw_len/(2*reps); % Length of block in bits
+                    n_zeros = len_zeros; % number of zeros
+
+                    % preallocate output of the decoder
+                    decoderOut_cw_tmp = zeros(n_cw, len_zeros); % all cw
+
+
+                    % reshape input codeword to decode to N_cw rows
+                    decode_in_cw = reshape(ldpc_in,[],n_cw).';
+
+                    for ii = 1:n_cw
+                        decoderIn_cw_temp = decode_in_cw(ii, :);
+                 
+                        decoderIn_cw_rep_scram = decoderIn_cw_temp(1, len_zeros+1:len_zeros+n_zeros);
+                        PNseq_for_repetition = scram(length(decoderIn_cw_rep_scram), [1 1 1 1 1 1 1]);
+                        decoderIn_cw_rep = ((decoderIn_cw_rep_scram.').*(-2*PNseq_for_repetition+1)).';
+                        % replace repeated part in decoderIn_cw_temp by zero symbols (log. 0 = +1)
+                        decoderIn_cw_temp(1, len_zeros+1:len_zeros+n_zeros) = +10;
+                        decoderIn_cw_temp(1,1:len_zeros) = decoderIn_cw_temp(1,1:len_zeros)+decoderIn_cw_rep;
+                        decoderOut_cw = codes.ldpc_decode(-decoderIn_cw_temp.', H_data);
+                        decoderOut_cw_tmp(ii, :) = decoderOut_cw(1:len_zeros).';
+                    end
+
                     
             end % end switch
             

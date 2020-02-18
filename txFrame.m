@@ -176,6 +176,32 @@ classdef txFrame
                         encOut_cw = encOut_cw.';
                         encOut(ii, :) = encOut_cw;
                     end % end for loop for ldpc 
+                    
+                case 2
+                    % preallocation of output auxiliary matrix
+                    encOut = zeros(n_cw, cw_len);
+
+                    len_zeros = cw_len/(2*reps); % Length of block in bits
+                    n_zeros = len_zeros; % number of zeros
+                    % sequence length 2*L_z
+                    encInblocks = reshape(data_scrambled, len_zeros, []).';
+                    encInblocks = [encInblocks, zeros(length(data_scrambled)/len_zeros, n_zeros)]; % concatenate with zeros
+                    % encode each data word
+                    for ii = 1:n_cw
+                        encoderIn_cw_temp = encInblocks(ii, :);
+
+                        encoderOut_cw_temp = codes.ldpc(encoderIn_cw_temp.', H_data);
+                        encoderOut_cw_temp = encoderOut_cw_temp.';
+                        % repetiton and scrambling
+                        encoderIn_rep = encoderIn_cw_temp(1:len_zeros);
+                        pn_seq = scram(length(encoderIn_rep), [1 1 1 1 1 1 1]);
+                        encoderIn_cw_rep_scram = xor(encoderIn_rep, pn_seq.');
+                        % replacement of zeros bits (from L_z+1 to 336) by repeated and scrambled input sequence
+                        encoderOut_cw_temp2 = encoderOut_cw_temp;
+                        encoderOut_cw_temp2(1,len_zeros+1:336) = encoderIn_cw_rep_scram;
+                        encOut(ii, :) = encoderOut_cw_temp2;
+                    end % end loop for lppc
+
                 otherwise
                     warning('choose a valid repetiton number (1 )')
             end % end switch
