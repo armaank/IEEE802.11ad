@@ -15,7 +15,7 @@ classdef codes
              % ldpc decoder from MATLAB comms toolbox
              % inputs: ldpcSeq - an LDPC encoded sequence
              %         pcm - parity check matrix used to generate LDPC code
-             % outputs: seq - an LDPC deencoded sequence
+             % outputs: seq - an LDPC decoded sequence
             ldpcDecoder = comm.LDPCDecoder(pcm);
             seq = ldpcDecoder(ldpcSeq);
         end

@@ -83,7 +83,7 @@ classdef rxFrame
             % demodulate blocked data
             data_mod_rx = reshape(-data_mod_rx_blocks.', 1, []).';
             data_demod_rx = ...
-                modulator.demod(data_mod_rx, pi/2, modorder);
+                modulator.pskdemod(data_mod_rx, pi/2, modorder);
         
             % LDPC decoding data
             len_psdu_rx_padded = 8*n_octets + psdu_pad;

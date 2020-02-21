@@ -59,15 +59,21 @@ kohli@cooper.edu\\
 \maketitle
 
 \begin{abstract}
-We simulate the a portion of the physical (PHY) layer of the IEEE 802.11ad standard for directional, multi-gigabit (DMG) wireless communication. We demonstrate a functional link over an additive white Gaussian noise (AWGN) channel and present bit-error-rate (BER) curves. 
+We simulate the a portion of the physical (PHY) layer of the IEEE 802.11ad standard for directional, multi-gigabit (DMG) wireless communication. The standard specifies a single carrier (SC)-PHY layer, that specifies four required modulation and coding schemes (MCS). We demonstrate a functional link over an additive white Gaussian noise (AWGN) channel and present bit-error-rate (BER) curves for each of the data rates in the DMG SC-PHY specification. 
 \end{abstract}
 
 \begin{IEEEkeywords}
-IEEE802.11ad, WiGIG, LDPC codes, golay sequences, wireless link simulations
+IEEE802.11ad, WiGIG, wireless link simulations
 \end{IEEEkeywords}
 
 \section{Introduction}
-We simulate three different wireless links. First, we verify simulating 4QAM and 16QAM simulations match theoretical bit error rate (BER) curves. Next, we design an adaptive equalizer to mitigate inter-symbol-interference over a wireless channel and achieve a BER less than $10^{-4}$ at 12dB signal-to-noise ratio (SNR) for BPSK. Finally, we use error correcting codes to maximize bit rate and achieve a BER less than $10^{-6}$ at 12dB SNR.
+
+IEEE 802.11ad was added to the 802.11 standard in 2012 as one of the first wireless standards to support multi-gigabit communications. The system achieves such high datarates by operating at the 60GHz band, with a 2GHz bandwidth, sacrificing range for tremendous throughput. Early applications of the standard include SoCs designed for virtual reality. The specification requires four different MCSs, however the core architecture of the DMG CS-PHY is illustrated below:
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=.4]{./media/phy.png}}
+\caption{Transmitter block diagram for the DMG SC-PHY specification in IEEE 802.11ad}
+\label{4ber}
+\end{figure}
 
 \section{4QAM \& 16QAM Performance}
 We were able to successfully match theoretical performance for both 4 and 16-ary QAM schemes over additive white Gaussian noise (AWGN) channels. 

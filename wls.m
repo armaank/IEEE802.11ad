@@ -9,8 +9,8 @@ snr_len = length(snr_vec);
 n_frames = 10; % number of iterations for the monte-carlo simulation
 n_octets = 1000; % number of data octets in PSDU 
 
-mcs = 11;   % MCSs that are required for the standard [1, 2, 3, 4]
-
+% MCSs that are required for the standard [1, 2, 3, 4]
+mcs = [8];   
 % setting up awgn channel
 awgnChannel = comm.AWGNChannel('NoiseMethod','Variance','Variance',1);
 errorRate = comm.ErrorRate;
@@ -24,15 +24,15 @@ for frame_num = 1:n_frames % average results over n_frames
         errorStats = zeros(1,3);
         % get code rate, modulation order from MCS to scale noise power
         [modOrder, ~, codeRate, ~, ~, ~, ~, ~]  = mcsParams(mcs);
-        % Calculating the noise variance and converting EbNo to SNR with
+        % calculating the noise variance and converting EbNo to SNR with
         % modificaitons to account for the error control coding
         EsNo = snr_vec(snr) + 10*log10(modOrder);       
         snrdB = EsNo + 10*log10(codeRate);      
         noiseVar = 1./(10.^(snrdB/10)); 
-        % Adding the proper noise to the channel cooresponding to the SNR
+        % adding the proper noise to the channel cooresponding to the SNR
         awgnChannel.Variance = noiseVar;
 
-        while errorStats(3) < 2e4
+        while errorStats(3) < 1e6
             % generate random PSDU bits
             psdu_bits_tx = randi([0 1],n_octets*8,1);
             % generate random seed for scrambling sequences
@@ -58,7 +58,7 @@ ber_Vec=mean(berVec,1);
 figure(1)
 
 %%
-% Generating Waterfall Plot
+% generating Waterfall Plot
 semilogy(snr_vec,ber_Vec,'-*')
 grid on
 xlabel('SNR (dB)')

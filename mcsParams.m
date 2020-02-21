@@ -94,37 +94,7 @@ switch(mcs_num)
         n_data_bits = 546; 
         Ncbpb = 896; 
         rep = 1; 
-    
-    case 10
-        modorder = 16; 
-        Ncbps = 4; 
-        ldpc_cr = 1/2; 
-        Mbps = 3080;
-        cw_len = 672; 
-        n_data_bits = 336; 
-        Ncbpb = 1792;
-        rep = 1;  
-        
-    case 11
-        modorder = 16; 
-        Ncbps = 4; 
-        ldpc_cr = 5/8; 
-        Mbps = 3850; 
-        cw_len = 672; 
-        n_data_bits = 420;
-        Ncbpb = 1792;
-        rep = 1;  
-        
-    case 12
-        modorder = 16; 
-        Ncbps = 4; 
-        ldpc_cr = 3/4; 
-        Mbps = 4620; 
-        cw_len = 672; 
-        n_data_bits = 504; 
-        Ncbpb = 1792;
-        rep = 1;  
-               
+
     otherwise
         warning('choose a valid mcs')
     
