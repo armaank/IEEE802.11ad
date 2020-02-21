@@ -1,4 +1,4 @@
-% defining functions associated with error control coding
+% Functions associated with error control coding
 classdef codes
     methods(Static)
 
@@ -24,6 +24,7 @@ classdef codes
             % generate parity check matrix for LDPC code
             % inputs: coderate - coderate
             % outputs: PCM - partiy check matrix
+            
             if(coderate == 1/2)
                 H = sparse(336, 672); % size of parity check matrix
                 Z = 42; % size of cyclic permutation matrix
@@ -57,8 +58,19 @@ classdef codes
                 nan, 31,nan, 23,nan, 21,nan, 20,nan,  9, 12,nan,nan,  0, 13,nan;
                 nan, 22,nan, 34, 31,nan, 14,nan,  4,nan,nan,nan,nan,nan, 22, 24;
                 ];
+            elseif(coderate == 13/16)
+                H = sparse(126, 672);
+                Z = 42;
+                I = speye(Z);
+                P= [29, 30,  0,  8, 33, 22, 17,  4, 27, 28, 20, 27, 24, 23,nan,nan;
+                37, 31, 18, 23, 11, 21,  6, 20, 32,  9, 12, 29, 10,  0, 13,nan;
+                25, 22,  4, 34, 31,  3, 14, 15,  4,  2, 14, 18, 13, 13, 22, 24;
+                ];
+            
             end
-            PCM = codes.makePCM(H, P, I);               
+            
+            PCM = codes.makePCM(H, P, I);  
+            
         end
 
         function [Ishift] = LDPCshift(Pblock, I)
@@ -102,7 +114,7 @@ classdef codes
                 inputbit = input(ii);
                 tmpoutputCRC = step(crcGen, inputbit);
 
-                % set output as the 'InitialConditions'
+                % set output as the InitialConditions
                 release(crcGen)
                 set(crcGen, 'InitialConditions', tmpoutputCRC(1:16))
             end

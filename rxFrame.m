@@ -1,8 +1,8 @@
-% receiving a single frame following the IEEE 802.11ad standard
+% Receiving a single frame following the IEEE 802.11ad standard
 classdef rxFrame
     methods(Static)
         
-        function [PSDU_rx] = deconFrame(rx_frame, mcs, seed, n_octets)
+        function [PSDU_rx] = deconFrame(rx_frame, n_octets, mcs, seed)
             % function to deconstruct received frame
             % inputs: rx_packet - the recieved frame 
             % outputs: 
@@ -12,8 +12,7 @@ classdef rxFrame
             % since equalization isn't part of the spec, we don't need to
             % do anything with the STF and CEF fields, we only need to
             % parse the data to check the BER
-%             [mcs, seed, n_octets] = ...
-%                 rxFrame.deconHeader(header_rx);
+
             [PSDU_rx] = ...
                 rxFrame.deconData(data_rx, mcs, seed, n_octets);
            
@@ -50,13 +49,15 @@ classdef rxFrame
             %         n_octets - the number of data octets, recovered from
             %                    the header
             % outputs: 
-             % retrieving mcs-dependent constants
+            
+            % retrieving mcs-dependent constants
             [modorder, Ncbps, ldpc_cr, Mbps, cw_len, n_data_bits,...
                 Ncbpb, reps ] = mcsParams(mcs);
-             % computing padding sizes
+            % computing padding sizes
             n_cw = ceil((n_octets*8)/((cw_len/reps)*ldpc_cr));   
             psdu_pad = (n_cw*(cw_len/reps)*ldpc_cr)-(n_octets*8);
             n_blks = ceil((n_cw*cw_len)/Ncbpb);
+            %n_blks = n_blks
             n_blk_pad = (n_blks*Ncbpb)-(n_cw*cw_len);
 
             % perform GI removal
@@ -70,6 +71,8 @@ classdef rxFrame
             n_fft = 512;
             % demodulate gaurd interval
             gaurd_rx = data_mod_rx_GI(:,1:64);
+            %gaurd_rx_size = size(gaurd_rx)
+            %gaurd_mod_rx_size = size(Ga64_mod_rx(1:n_blks, :))
             Ga64_mod_rx(1:n_blks, :) = gaurd_rx;
             k_Ga64 = 0:64-1;
             Ga64_rx = ...
@@ -80,7 +83,7 @@ classdef rxFrame
             % demodulate blocked data
             data_mod_rx = reshape(-data_mod_rx_blocks.', 1, []).';
             data_demod_rx = ...
-                modulator.pskdemod(data_mod_rx, pi/2, modorder);
+                modulator.demod(data_mod_rx, pi/2, modorder);
         
             % LDPC decoding data
             len_psdu_rx_padded = 8*n_octets + psdu_pad;

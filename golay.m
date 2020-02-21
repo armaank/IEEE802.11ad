@@ -1,4 +1,4 @@
-% generates a type of golay sequence for gaurd intervals
+% Function to generate golay sequences for gaurd intervals
 
 function [golay_seq] = golay(type)
 

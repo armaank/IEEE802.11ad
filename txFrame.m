@@ -119,7 +119,7 @@ classdef txFrame
             header_cw = [cw1; cw2_scrambled];
             
             % pi/2 bpsk modulating the header
-            header_mod = modulator.pskmod(header_cw, pi/2, 2);
+            header_mod = modulator.mod(header_cw, pi/2, 2);
             % gaurd insertion for the header
             Ga64 = golay('a64');
             % modulating the golay sequence
@@ -214,7 +214,7 @@ classdef txFrame
 
             encoderOut = [ldpc_out, block_pad_scrambled.']; 
             % modulate data
-            mod_data = modulator.pskmod(encoderOut.', pi/2, modorder);
+            mod_data = modulator.mod(encoderOut.', pi/2, modorder);
             
             % adding GIs
             mod_data_blocks = reshape(mod_data, [], n_blks);

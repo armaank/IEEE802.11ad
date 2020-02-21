@@ -1,3 +1,5 @@
+% Function to scramble bits via LFSR
+
 function [seq] = scram(seqlen, seed)
     % data scrambler
     % generates scrambling sequence from x^7 + x^4 + 1
