@@ -10,7 +10,7 @@ n_frames = 10; % number of iterations for the monte-carlo simulation
 n_octets = 1000; % number of data octets in PSDU 
 
 % MCSs that are required for the standard [1, 2, 3, 4]
-mcs = [8];   
+mcs = [7];   
 % setting up awgn channel
 awgnChannel = comm.AWGNChannel('NoiseMethod','Variance','Variance',1);
 errorRate = comm.ErrorRate;
