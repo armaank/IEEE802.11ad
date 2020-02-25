@@ -10,7 +10,7 @@ n_frames = 10; % number of iterations for the monte-carlo simulation
 n_octets = 1000; % number of data octets in PSDU 
 
 % MCSs that are required for the standard [1, 2, 3, 4]
-mcs = [7];   
+mcs = [1];   
 % setting up awgn channel
 awgnChannel = comm.AWGNChannel('NoiseMethod','Variance','Variance',1);
 errorRate = comm.ErrorRate;
@@ -32,7 +32,7 @@ for frame_num = 1:n_frames % average results over n_frames
         % adding the proper noise to the channel cooresponding to the SNR
         awgnChannel.Variance = noiseVar;
 
-        while errorStats(3) < 1e6
+        while errorStats(3) < 5e6
             % generate random PSDU bits
             psdu_bits_tx = randi([0 1],n_octets*8,1);
             % generate random seed for scrambling sequences
