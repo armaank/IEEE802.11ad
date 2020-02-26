@@ -63,7 +63,7 @@ semilogy(snr_vec,ber_Vec,'-*')
 grid on
 xlabel('SNR (dB)')
 ylabel('Bit Error Rate')
-title("BER Waterfall Curves for MCS");
+title("BER Waterfall Curve");
 
 
 

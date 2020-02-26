@@ -1,164 +1,143 @@
 \documentclass[conference]{IEEEtran}
-\IEEEoverridecommandlockouts
-% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
-\usepackage{cite}
-\usepackage{amsmath,amssymb,amsfonts}
-%\usepackage{algorithmic}
-\usepackage{graphicx}
-\usepackage{textcomp}
-\usepackage{hyperref}
-\usepackage{xcolor}
-\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
-    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
-\begin{document}
 
-\title{Physical Layer Simulation of IEEE 802.11ad\\
-%{\footnotesize \textsuperscript{*}Note: Sub-titles are not captured in Xplore and
-%should not be used}
-%\thanks{Identify applicable funding agency here. If none, delete this.}
+\usepackage{amsmath}
+\usepackage{graphicx}
+%\usepackage[backend=bibtex,style=chem-rsc]{biblatex}
+\usepackage{lettrine}
+\usepackage{cite}
+\usepackage{float}
+\usepackage{blindtext}
+\usepackage{eso-pic}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[numbers]{natbib}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{filecontents}
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\newcommand\AtPageUpperMyright[1]{\AtPageUpperLeft{%
+    \put(\LenToUnit{0.5\paperwidth},\LenToUnit{-1cm}){%
+     \parbox{0.5\textwidth}{\raggedleft\fontsize{9}{11}\selectfont #1}}%
+    }}%
+    \newcommand{\conf}[1]{%
+    \AddToShipoutPictureBG*{%
+    \AtPageUpperMyright{#1}}
 }
 
-\author{\IEEEauthorblockN{Armaan Kohli}
-\IEEEauthorblockA{\textit{Department of Electrical Engineering} \\
+\title{Sample paper}
+
+\author{
+  \IEEEauthorblockN{Armaan Kohli}
+  \IEEEauthorblockA{\textit{Department of Electrical Engineering} \\
 \textit{The Cooper Union for the Advancement of Science and Art}\\
 New York City, United States \\
 kohli@cooper.edu\\
 \href{github.com/armaank/IEEE802.11ad}{https://github.com/armaank/IEEE802.11ad}}}
-%\and
-%\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
-%\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%\textit{name of organization (of Aff.)}\\
-%City, Country \\
-%email address or ORCID}
-%\and
-%\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
-%\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%\textit{name of organization (of Aff.)}\\
-%City, Country \\
-%email address or ORCID}
-%\and
-%\IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
-%\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%\textit{name of organization (of Aff.)}\\
-%City, Country \\
-%email address or ORCID}
-%\and
-%\IEEEauthorblockN{5\textsuperscript{th} Given Name Surname}
-%\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%\textit{name of organization (of Aff.)}\\
-%City, Country \\
-%email address or ORCID}
-%\and
-%\IEEEauthorblockN{6\textsuperscript{th} Given Name Surname}
-%\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
-%\textit{name of organization (of Aff.)}\\
-%City, Country \\
-%email address or ORCID}
-%}
+
+\begin{document}
+\title{Physical Layer Simulation of IEEE 802.11ad}
 
 \maketitle
+\conf{ECE-408: WIRELESS COMMUNICATIONS, FEBRUARY 2020}
 
 \begin{abstract}
-We simulate the a portion of the physical (PHY) layer of the IEEE 802.11ad standard for directional, multi-gigabit (DMG) wireless communication. The standard specifies a single carrier (SC)-PHY layer, that specifies four required modulation and coding schemes (MCS). We demonstrate a functional link over an additive white Gaussian noise (AWGN) channel and present bit-error-rate (BER) curves for each of the data rates in the DMG SC-PHY specification. 
+ We simulate a portion of the physical (PHY) layer of the IEEE 802.11ad standard for directional, multi-gigabit (DMG) wireless communication. The standard specifies a single carrier (SC)-PHY layer, that specifies various required modulation and coding schemes (MCS), as well as a frame structure. We demonstrate a functional link over an additive white Gaussian noise (AWGN) channel and present bit-error-rate (BER) curves for each of the data rates in the DMG SC-PHY specification. 
 \end{abstract}
 
 \begin{IEEEkeywords}
-IEEE802.11ad, WiGIG, wireless link simulations
+IEEE802.11ad, WiGIG, wireless link simulations, Low-Density Parity Check Codes
 \end{IEEEkeywords}
 
 \section{Introduction}
-
-IEEE 802.11ad was added to the 802.11 standard in 2012 as one of the first wireless standards to support multi-gigabit communications. The system achieves such high datarates by operating at the 60GHz band, with a 2GHz bandwidth, sacrificing range for tremendous throughput. Early applications of the standard include SoCs designed for virtual reality. The specification requires four different MCSs, however the core architecture of the DMG CS-PHY is illustrated below:
+\lettrine[findent=2pt]{\textbf{I}}{ }EEE 802.11ad was added to the 802.11 standard in 2012 as one of the first wireless standards to support multi-gigabit communications. The system achieves such high datarates by operating at the 60GHz band, with a 2GHz bandwidth, sacrificing range for tremendous throughput. Early applications of the standard include SoCs designed for virtual reality. The specification requires four different MCSs, however the core architecture of the DMG SC-PHY is illustrated below:
 \begin{figure}[htbp]
 \centerline{\includegraphics[scale=.4]{./media/phy.png}}
 \caption{Transmitter block diagram for the DMG SC-PHY specification in IEEE 802.11ad}
-\label{4ber}
+\label{phy}
 \end{figure}
-
-\section{4QAM \& 16QAM Performance}
-We were able to successfully match theoretical performance for both 4 and 16-ary QAM schemes over additive white Gaussian noise (AWGN) channels. 
-
-We simulated performance by computing the bit error rate for a single 1000 symbol packet, averaged over 10 iterations. BER curves and constellation diagrams for 4QAM can be seen in Fig. \ref{4ber} and \ref{4star}. BER curves and constellation diagrams for 16QAM can be seen in Fig. \ref{16ber} and \ref{16star}
-\subsection{4QAM}
+\section{System Architecture}
+A single frame consists of a short-training field (STF), a channel estimation field (CEF), a header and the data field. 
+\subsection{Frame Structure}The STF consists of 16 repetitions of Golay sequences, $Ga_{128}(n)$ of length 128, followed by a single repetition of $-Ga_{128}(n)$. The CEF is used for channel estimation, as well as indication of which modulation is
+going to be used for the packet. The CEF is composed of a concatenation of two
+sequences Golay sequences, $Gu_{512}(n$) and $Gv_{512}(n)$, where the last 128 samples of $Gu_{512} (n)$ and $Gv_{512} (n)$ are equal to the last
+128 samples used in the STF. They are followed by a 128 samples sequence $Gv_{128}(n)$ equal
+to the first 128 samples of both $Gv_{512}(n)$ and $Gu_{512}(n)$. The CEF is pictured below in Fig. \ref{cef}
 \begin{figure}[htbp]
-%\centerline{\includegraphics[scale=.5]{./media/4qam.eps}}
-\caption{BER Curve for 4QAM over an AWGN channel}
-\label{4ber}
-\end{figure}
-\begin{figure}[htbp]
-%\centerline{\includegraphics[scale=.5]{./media/4qam_scatter.eps}}
-\caption{4QAM constellation}
-\label{4star}
-\end{figure}
-\subsection{16QAM}
-\begin{figure}[htbp]
-%\centerline{\includegraphics[scale=.5]{./media/16qam.eps}}
-\caption{BER Curve for 16QAM over an AWGN channel}
-\label{16ber}
-\end{figure}
-\begin{figure}[htbp]
-%\centerline{\includegraphics[scale=.5]{./media/16qam_scatter.eps}}
-\caption{16QAM constellation}
-\label{16star}
+\centerline{\includegraphics[scale=.35]{./media/cef.png}}
+\caption{Channel estimation field for SC}
+\label{cef}
 \end{figure}
 
-\section{Equalizing a Moderate ISI Channel}
-Next, we attempt to equalize a frequency selective channel that introduces ISI, using a BPSK modulation scheme. We attempted several different adaptive filtering algorithms in an attempt to equalize the channel. Generally speaking, we found RLS based algorithms difficult to stabilize, and linear equalizers tended to require long training sequences. We found that we achieved the best performance using a decision feedback equalizer (DFE) with a signed-LMS algorithm.
 
-We simulated the channel with $100,000$ symbols in order to ensure we met the performance specification of a BER less than $10^{-4}$ at 12dB, averaged over five iterations. 
+The header is fixed in length and comprised of twelve fields. The data field is is made up of the message bits, split up into blocks. 
 \begin{figure}[htbp]
-%\centerline{\includegraphics[scale=.4]{./media/bpsk.png}}
-\caption{BER Curve for BPSK over a frequency selective channel}
-\label{16ber}
-\end{figure}
-\begin{figure}[htbp]
-%\centerline{\includegraphics[scale=.4]{./media/bpsk_scatter.png}}
-\caption{BPSK constellation}
-\label{16star}
-\end{figure}
-We were able to successfully meet the specification, achieving a BER of approximately $10^{-6}$ at 12dB SNR.
-\section{Maximizing Bit Rate via Coding}
-Finally, we attempted to further improve the performance of our wireless communication system by introducing error control codes. In order to maximize bit rate while still achieving the $10^{-6}$ BER requirement at 12dB SNR, we decided to increase the order of modulation and use turbo codes. 
-
-We used 16QAM and a code rate of $\frac{2}{3}$ for the turbo codes. We generated the BER curve in Fig. \ref{turbo} using the standard 1000 symbol packet, averaged over five iterations. We were able to achieve a 2.667 bits per symbol, yielding a bit rate of 2666 bits per 1000 symbol packet.
-\begin{figure}[htbp]
-%\centerline{\includegraphics[scale=.55]{./media/turbo.eps}}
-\caption{BER curve for 16QAM w/ using turbo error control codes}
-\label{turbo}
+\centerline{\includegraphics[scale=.35]{./media/frame.png}}
+\caption{Frame structure for IEEE802.11ad}
+\label{phy}
 \end{figure}
 
-\section{Conclusion}
-We were able to successfully demonstrate understanding of communication theory fundamentals. We simulated AWGN and frequency selective channels, and corrected ISI both via adaptive equalization and error correcting codes.
 
-%\section*{References}
-%
-%Please number citations consecutively within brackets \cite{b1}. The 
-%sentence punctuation follows the bracket \cite{b2}. Refer simply to the reference 
-%number, as in \cite{b3}---do not use ``Ref. \cite{b3}'' or ``reference \cite{b3}'' except at 
-%the beginning of a sentence: ``Reference \cite{b3} was the first $\ldots$''
-%
-%Number footnotes separately in superscripts. Place the actual footnote at 
-%the bottom of the column in which it was cited. Do not put footnotes in the 
-%abstract or reference list. Use letters for table footnotes.
-%
-%Unless there are six authors or more give all authors' names; do not use 
-%``et al.''. Papers that have not been published, even if they have been 
-%submitted for publication, should be cited as ``unpublished'' \cite{b4}. Papers 
-%that have been accepted for publication should be cited as ``in press'' \cite{b5}. 
-%Capitalize only the first word in a paper title, except for proper nouns and 
-%element symbols.
-%
-%For papers published in translation journals, please give the English 
-%citation first, followed by the original foreign-language citation \cite{b6}.
-%
-%%\begin{thebibliography}{00}
-%%\bibitem{b1} G. Eason, B. Noble, and I. N. Sneddon, ``On certain integrals of Lipschitz-Hankel type involving products of Bessel functions,'' Phil. Trans. Roy. Soc. London, vol. A247, pp. 529--551, April 1955.
-%%\bibitem{b2} J. Clerk Maxwell, A Treatise on Electricity and Magnetism, 3rd ed., vol. 2. Oxford: Clarendon, 1892, pp.68--73.
-%%\bibitem{b3} I. S. Jacobs and C. P. Bean, ``Fine particles, thin films and exchange anisotropy,'' in Magnetism, vol. III, G. T. Rado and H. Suhl, Eds. New York: Academic, 1963, pp. 271--350.
-%%\bibitem{b4} K. Elissa, ``Title of paper if known,'' unpublished.
-%%\bibitem{b5} R. Nicole, ``Title of paper with only first word capitalized,'' J. Name Stand. Abbrev., in press.
-%%\bibitem{b6} Y. Yorozu, M. Hirano, K. Oka, and Y. Tagawa, ``Electron spectroscopy studies on magneto-optical media and plastic substrate interface,'' IEEE Transl. J. Magn. Japan, vol. 2, pp. 740--741, August 1987 [Digests 9th Annual Conf. Magnetics Japan, p. 301, 1982].
-%%\bibitem{b7} M. Young, The Technical Writer's Handbook. Mill Valley, CA: University Science, 1989.
-%%\end{thebibliography}
+The AGC and TRN-R/T subfields are used for power and synchronization. We don't implement these fields, as they are optional according to the specification.
+\subsection{Data Scrambler} 
+The header and data fields following the scrambler initialization field are scrambled by XORing each bit in turn with a length 127 periodic sequence generated by the polynomial
+$S ( x ) = x^7 + x^4 + 1$. This is realized using a linear feedback shift register (LFSR) structure. The seed value is set randomly and added unscrambled as the seven bits of the header field for the receiver.
+\begin{table*}[t]
+\normalsize
+\caption{802.11ad modulation and coding schemes}
+\label{mcs}
+\centering
+\begin{tabular}{@{}cccccc@{}}
+\toprule
+MCS Indecx & Modulation & $N_{cbps}$ & Repetiton & Code Rate & Data Rate (Mbps) \\ \midrule
+1 & $\pi/2$ BPSK & 1 & 2 & 1/2 & 385 \\
+2 & $\pi/2$ BPSK & 1 & 1 & 1/2 & 770 \\
+3 & $\pi/2$ BPSK & 1 & 1 & 5/8 & 962.5 \\
+4 & $\pi/2$ BPSK & 1 & 1 & 3/4 & 1155 \\
+5 & $\pi/2$ BPSK & 1 & 1 & 13/16 & 1251.25 \\
+6 & $\pi/2$ QPSK & 4 & 1 & 1/2 & 1540 \\
+7 & $\pi/2$ QPSK & 4 & 1 & 5/8 & 1925 \\
+8 & $\pi/2$ QPSK & 4 & 1 & 3/4 & 2310 \\
+9 & $\pi/2$ QPSK & 4 & 1 & 13/16 & 2502.5 \\ \bottomrule
+\end{tabular}
+\end{table*}
+\subsection{Encoding}
+The data are encoded by a systematic LDPC encoder. The LDPC is a block code. Each block of information
+bits $(b_1 , b_2 ,...,b_k )$ is concatenated with a block of parity bits $(p_1 ,p_2 ,....,p_{n-k} )$ to create a codeword $c =( b_1 ,b_2 ,...,b_k ,p_1 ,p_2 ,....,p_{ n-k} )$ such that $Hc^T = 0$ , where $H$ is the (n-k)xn party check matrix. The block size n is $L_{CW}= 672$ bits. The code rate, $R$, is equal to $k/n$. 
 
+Regarding the data, the LDPC encoding scheme depends on the repetition rate. If the repetition rate is $1$, The output stream of the scrambler is broken into blocks of $L_{CWD} = L_{CW} \times R$ bits. To each data word, $n-k=L_{CW} - R \times L_{CW}$ parity bits are added to create a codeword $c^{m}$ (the $m$th word), such that $Hc^{m^{T}} = 0$. If the repetition rate is $2$, then the data bits in each code word are concatenated with $L_{cw}/4$ zeros. The LDPC codeword $c$ is created by generating the parity bits  such that $Hc^T = 0$ , where $H$ is the parity matrix
+for rate 1/2 LDPC code. Finally, we replace bits $L_{cw}/4 + 1$ through 336 of the codeword c with bits from the sequence XORed by a PN sequence that is generated from the LFSR used for data
+scrambling as defined. The LFSR is initialized to the all ones vector and reinitialized to the same vector after every codeword. Regardless of repetition rate, the coded bits then are concatenated together and padded. 
+
+The header is encoded separately from the data bits. The input header bits are scrambled, starting at the eigth bit. The LDPC codeword $c$ is generated by concatenating the header with the appropriate amount of zeros, such that $Hc^T = 0$, where $H$ is the parity check matrix for a rate $3/4$ code. The header is then split up into two sequences, one of which is XORed with a PN sequence from the LFSR, initialized to the all ones vector. The two sequences are then concatenated together to form the encoded header bits. For each of the different code rates, the standard specifies a different parity check matrix $H$.
+
+\subsection{Modulation, Blocking and Guard Intervals} 
+The STF, CEF is modulated as $\pi/2$ BPSK. The data field is modulated in ordinance with the specific modulation and coding scheme. Depending on the symbol mapping, a guard interval made of a 64 bit Golay sequence is inserted into the data field. For example, for $\pi/2$ BPSK, the number of coded bits per block ($N_{cbpb}$) is 448. Fig. \ref{data} illustrates the insertion of the guard intervals for this case. 
+\begin{figure}[htbp]
+\centerline{\includegraphics[scale=.4]{./media/data.png}}
+\caption{Block transmission for $pi/2$ BPSK}
+\label{data}
+\end{figure} 
+
+The two code words in the header field are blocked, an a 64 bit Golay sequence is placed between the two. The header is then modulated as $\pi/2$ BPSK. 
+
+\section{Modulation and Coding Schemes}
+We simulated the modulation and coding schemes, presented in Table \ref{mcs}. For a transmitter or receiver to comply to the standard, only MCSs 1-4 must be implemented, all others are beyond the scope of what is required in the specification.
+% Please add the following required packages to your document preamble:
+% \usepackage{booktabs}
+
+
+MCS 1 is typically designated for a control channel, whereas all other MCSs are used for high bit-rate data transmission. 
+
+
+
+\section{Simulations and Results} 
+We simulated each of the specified MCSs over an AWGN channel to compute bit error rate curves. The standard was designed for high data rate communications, and uses extensive error correction, so simulating takes an extensive amount of computational time. In particular, we were unable to simulate more than one point on the BER curve for MCS 1, due to the repetition coding. 
+
+We simulated the transmission of ten frames, each consisting of 1000 data octets, corresponding to 8000 data bits per frame. For each frame, we computed the bit error rate over a range of signal-to-noise ratios for an AWGN channel. We scaled the channel noise accordingly to the modulation order and code rate. We then averaged the bit error rates over the ten packets to compute curves. 
+
+\section{Conclusion} 
+We successfully studied, implemented and simulated the DMG SC-PHY layer of the IEEE802.11ad standard. We were able to see how the combination of LDPC codes, various sequence types and various modulation schemes worked in tandem allow for high, multi-gigabit data rates in a wireless system.
+
+\bibliographystyle{unsrt}
+\bibliography{bibli}
 \end{document}
