@@ -2,7 +2,7 @@
 clc;
 clear;
 
-%% BER Simulation
+%% Simulation Params
 
 snr_vec = -2:1:12; % SNR values for BER curve
 snr_len = length(snr_vec);
@@ -11,7 +11,10 @@ n_octets = 1000; % number of data octets in PSDU
 
 % MCSs that are required for the standard [1, 2, 3, 4]
 % Simulations for lower MCS indicies span multiple hours, even days. 
-mcs = [9];   
+% Higher MCS values have more bit errors, and take less time to simulate.
+mcs = 9;   
+
+%% Simulation
 % setting up awgn channel
 awgnChannel = comm.AWGNChannel('NoiseMethod','Variance','Variance',1);
 errorRate = comm.ErrorRate;
@@ -52,13 +55,21 @@ for frame_num = 1:n_frames % average results over n_frames
         % reset the bit error rate object
         berVec(frame_num,snr) = errorStats(1);
         reset(errorRate)
+        
+        disp_out_snr = sprintf(...
+            'Done w/ BER computation for snr of %d, frame number %d', ...
+            snr_vec(snr), frame_num);
+        
+        disp(disp_out_snr)
     end % end snr loop 
+    disp_out_frame = sprintf('Done processing frame %d',frame_num);
+    disp(disp_out_frame)
 end % end n_frames loop
 
 ber_Vec=mean(berVec,1);
 figure(1)
 
-%%
+%% Waterfall Plot Generation
 % generating Waterfall Plot
 semilogy(snr_vec,ber_Vec,'-*')
 grid on

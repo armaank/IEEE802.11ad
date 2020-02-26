@@ -1,4 +1,6 @@
-% script to plot ber curves from wls
+% script to ber curves from wls
+clc; clear;
+%% BPSK
 ber1 = importdata('ber1.mat')
 ber2 = importdata('ber2.mat')
 ber3 = importdata('ber3.mat')
@@ -15,7 +17,7 @@ ylabel('Bit Error Rate', 'FontSize', 14);
 legend("MCS1", "MCS2", "MCS3", "MCS4", "MCS5", "location", "best")
 ax = gca
 ax.LineWidth = 1.75
-%%
+%% QPSK
 ber6 = importdata('ber6.mat')
 ber7 = importdata('ber7.mat')
 ber8 = importdata('ber8.mat')
